@@ -1,0 +1,32 @@
+apiVersion: ai.sap.com/v1alpha1
+kind: ServingTemplate
+metadata:
+  name: custom-embeddings
+  annotations:
+    scenarios.ai.sap.com/description: "Run a custom embeddings server on AI Core"
+    scenarios.ai.sap.com/name: "custom-embedding-scenario"
+    executables.ai.sap.com/description: "Run a custom embeddings server on AI Core"
+    executables.ai.sap.com/name: "custom-embedding-executable"
+  labels:
+    scenarios.ai.sap.com/id: "custom-embedding-server"
+    ai.sap.com/version: "0.1"
+spec:
+  template:
+    apiVersion: "serving.kserve.io/v1beta1"
+    metadata:
+      annotations: |
+        autoscaling.knative.dev/metric: concurrency
+        autoscaling.knative.dev/target: 1
+        autoscaling.knative.dev/targetBurstCapacity: 0
+      labels: |
+        ai.sap.com/resourcePlan: basic
+    spec: |
+      predictor:
+        minReplicas: 1
+        maxReplicas: 1
+        containers:
+        - name: kserve-container
+          image: ratheeshsap/customembeddings
+          ports:
+            - containerPort: 5000
+              protocol: TCP
